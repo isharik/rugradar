@@ -18,6 +18,7 @@
     "http": "tsx src/http.ts",
     "assess": "tsx src/cli.ts",
     "find-scam": "tsx src/find-scam.ts",
+    "demo": "tsx src/demo-caller.ts",
     "test:discriminate": "tsx src/cli.ts --selftest",
     "test:mcp": "tsx src/test-mcp-client.ts",
     "typecheck": "tsc --noEmit"
