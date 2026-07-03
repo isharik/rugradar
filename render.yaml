@@ -1,0 +1,21 @@
+# Render.com deployment (free tier, $0). Gives RugRadar a stable public HTTPS URL
+# like https://rugradar.onrender.com — that URL is what you register on OKX.AI.
+#
+# Deploy: push this repo to GitHub → render.com → New → Blueprint → pick the repo.
+# Note: free web services sleep after ~15 min idle; keep it warm with a free pinger
+# (UptimeRobot / cron-job.org) hitting /health every 10 minutes.
+services:
+  - type: web
+    name: rugradar
+    runtime: node
+    plan: free
+    buildCommand: npm install && npm run build
+    startCommand: npm run start
+    healthCheckPath: /health
+    envVars:
+      - key: PAYMENT_MODE
+        value: testnet
+      - key: PRICE_PER_CALL
+        value: "0.01"
+      - key: DEFAULT_CHAIN_ID
+        value: "1"
