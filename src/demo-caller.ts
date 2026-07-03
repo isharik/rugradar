@@ -29,9 +29,9 @@ function bar(score: number): string {
 async function checkAndDecide(chain: number, address: string, intent: string) {
   console.log(`\n🤖  TradeBot wants to swap 0.5 ETH  →  ${intent}`);
   console.log(`     ${address}`);
-  await sleep(900);
+  await sleep(1800);
   console.log(`\n     ⏳ Calling RugRadar (OKX.AI ASP #3518) before trading…`);
-  await sleep(1100);
+  await sleep(2200);
 
   const r = (await assessTokenRisk({ chain, token_address: address })) as AssessResult;
   if (!("verdict" in r)) {
@@ -49,14 +49,14 @@ async function checkAndDecide(chain: number, address: string, intent: string) {
   if (fails.length) console.log(`   │  Red flags   : ${fails.join(", ")}`);
   console.log(`   │  Sources     : ${r.sources.filter((s) => s.reachable).map((s) => s.name).join(", ")}`);
   console.log(`   └${"─".repeat(57)}`);
-  await sleep(900);
+  await sleep(1800);
 
   if (r.verdict === "AVOID" || r.verdict === "HIGH_RISK") {
     console.log(`\n   ❌ SWAP ABORTED — RugRadar flagged ${r.verdict}. Wallet saved. 🛡️`);
   } else {
     console.log(`\n   ✅ Looks clean — TradeBot proceeds with the swap.`);
   }
-  await sleep(1200);
+  await sleep(2600);
 }
 
 async function main() {
@@ -67,7 +67,7 @@ async function main() {
   console.log("  RugRadar — pre-transaction risk oracle for AI agents");
   console.log("  Any agent can call it before a swap. One call. One verdict.");
   console.log("══════════════════════════════════════════════════════════");
-  await sleep(1200);
+  await sleep(2600);
 
   console.log("\n———  Scenario 1: the trap  ———");
   await checkAndDecide(scam.chain, scam.address, scam.label);
