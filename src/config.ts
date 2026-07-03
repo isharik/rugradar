@@ -135,7 +135,8 @@ export const CONFIG: AppConfig = {
       assetDecimals: asset.decimals,
       payTo: (process.env.PAY_TO ?? "").toLowerCase(),
       facilitatorAddress: process.env.PAY_FACILITATOR ?? "",
-      publicUrl: process.env.PUBLIC_URL ?? "",
+      // On Render, RENDER_EXTERNAL_URL is injected automatically → no manual step.
+      publicUrl: process.env.PUBLIC_URL || process.env.RENDER_EXTERNAL_URL || "",
       okxApiKey: process.env.OKX_API_KEY ?? "",
       okxSecretKey: process.env.OKX_SECRET_KEY ?? "",
       okxPassphrase: process.env.OKX_PASSPHRASE ?? "",

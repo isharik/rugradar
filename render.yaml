@@ -14,7 +14,13 @@ services:
     healthCheckPath: /health
     envVars:
       - key: PAYMENT_MODE
-        value: testnet
+        value: mainnet
+      - key: PAYMENTS_ENABLED
+        value: "true"
+      - key: PAY_TO
+        value: "0x60a1527c6de59a6e2c2da4a3e9a1da35b8bf4eca"
+      - key: PAY_ASSET_SYMBOL
+        value: USDT
       - key: PRICE_PER_CALL
         value: "0.01"
       - key: DEFAULT_CHAIN_ID
