@@ -16,6 +16,43 @@ import type { AssessResult } from "./schema.js";
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
+// The real deployed endpoint listed on OKX.AI (Agent #3518).
+const LIVE = process.env.PUBLIC_URL || "https://rugradar-3wka.onrender.com";
+
+/**
+ * Proves — on camera — that this is a REAL deployed, paid x402 service, not a
+ * local mock. Pings the live health check, then shows the live 402 challenge.
+ * No payment is made (a 402 is the server *asking* for payment) → completely free.
+ */
+async function proveLive() {
+  console.log("\n🌐  RugRadar is deployed & listed on OKX.AI  →  Agent #3518");
+  console.log(`     Verifying the LIVE endpoint: ${LIVE}`);
+  await sleep(1600);
+  try {
+    const h = await fetch(`${LIVE}/health`, { signal: AbortSignal.timeout(60000) });
+    const hj = (await h.json()) as { status?: string };
+    console.log(`     ✓ GET /health  →  ${h.status} ${hj.status ?? ""}`);
+    await sleep(1600);
+
+    const r = await fetch(`${LIVE}/assess`, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: "{}",
+      signal: AbortSignal.timeout(30000),
+    });
+    console.log(`     ↳ POST /assess (no payment)  →  HTTP ${r.status} ${r.statusText}`);
+    if (r.status === 402) {
+      const body = (await r.json()) as { accepts?: { maxAmountRequired?: string; payTo?: string; network?: string }[] };
+      const a = body.accepts?.[0];
+      console.log(`     💳 402 Payment Required — this is a real pay-per-call x402 service.`);
+      if (a) console.log(`        A calling agent settles 0.01 USDT to ${a.payTo?.slice(0, 10)}… on X Layer, then gets the verdict.`);
+    }
+  } catch {
+    console.log(`     (live endpoint warming up — continuing with the local engine)`);
+  }
+  await sleep(2400);
+}
+
 // A current live honeypot (found via `npm run find-scam`). Swap in a fresh one
 // any time by passing args; RugRadar re-assesses live either way.
 const SCAM = { chain: 1, address: "0x3412e7ba992d8c5eb76ceabf8b5960f2e250868a", label: "unknown token from a DEX ad" };
@@ -68,6 +105,8 @@ async function main() {
   console.log("  Any agent can call it before a swap. One call. One verdict.");
   console.log("══════════════════════════════════════════════════════════");
   await sleep(2600);
+
+  await proveLive();
 
   console.log("\n———  Scenario 1: the trap  ———");
   await checkAndDecide(scam.chain, scam.address, scam.label);
