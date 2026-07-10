@@ -25,3 +25,12 @@ services:
         value: "0.01"
       - key: DEFAULT_CHAIN_ID
         value: "1"
+      # OKX Developer Portal credentials (real x402 verify/settle via OKX's
+      # facilitator). sync:false = Render prompts you to paste these in the
+      # dashboard; they are never committed to the repo.
+      - key: OKX_API_KEY
+        sync: false
+      - key: OKX_SECRET_KEY
+        sync: false
+      - key: OKX_PASSPHRASE
+        sync: false
