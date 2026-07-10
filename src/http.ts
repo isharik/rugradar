@@ -88,26 +88,33 @@ if (paymentsConfigured()) {
   );
   resourceServerToInitialize = resourceServer;
 
-  const httpServer = new x402HTTPResourceServer(resourceServer, {
-    "POST /assess": {
-      description: "RugRadar assess_token_risk — pre-transaction token risk verdict",
-      mimeType: "application/json",
-      accepts: {
-        scheme: "exact",
-        network: "eip155:196",
-        payTo: CONFIG.payment.payTo,
-        price: `$${CONFIG.payment.pricePerCall}`,
-        maxTimeoutSeconds: 300,
-      },
+  const assessRoute = {
+    description: "RugRadar assess_token_risk — pre-transaction token risk verdict",
+    mimeType: "application/json",
+    accepts: {
+      scheme: "exact" as const,
+      network: "eip155:196" as const,
+      payTo: CONFIG.payment.payTo,
+      price: `$${CONFIG.payment.pricePerCall}`,
+      maxTimeoutSeconds: 300,
     },
+  };
+
+  const httpServer = new x402HTTPResourceServer(resourceServer, {
+    // POST is the real business route. GET is registered too purely so
+    // discovery/validation probes (e.g. `onchainos agent x402-check`, which
+    // sends an unauthenticated GET) see the 402 challenge instead of a 404.
+    "POST /assess": assessRoute,
+    "GET /assess": assessRoute,
   });
 
   app.use(paymentMiddlewareFromHTTPServer(httpServer));
   app.post("/assess", handleAssess);
+  app.get("/assess", handleAssess);
 } else {
   // Payments not configured (missing OKX credentials or disabled). Fail closed
   // rather than silently serving the paid resource for free.
-  app.post("/assess", (_req: Request, res: Response) => {
+  const notConfigured = (_req: Request, res: Response) => {
     res.status(503).json({
       ok: false,
       error: {
@@ -116,7 +123,9 @@ if (paymentsConfigured()) {
           "The paid A2MCP endpoint is not configured on this deployment (missing OKX_API_KEY / OKX_SECRET_KEY / OKX_PASSPHRASE / PAY_TO).",
       },
     });
-  });
+  };
+  app.post("/assess", notConfigured);
+  app.get("/assess", notConfigured);
   console.warn(
     "[RugRadar] Payments NOT configured — POST /assess will return 503. " +
       "Set OKX_API_KEY, OKX_SECRET_KEY, OKX_PASSPHRASE and PAY_TO to enable the real x402 endpoint.",
